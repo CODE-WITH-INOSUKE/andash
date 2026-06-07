@@ -10,6 +10,7 @@ on:
 env:
   NODE_VERSION: '20'
   JAVA_VERSION: '17'
+  GRADLE_VERSION: '8.3'
 
 jobs:
   build-web:
@@ -75,32 +76,30 @@ jobs:
             -keysize 2048 -validity 10000 \
             -dname "CN=Android Debug,O=Android,C=US"
 
+      - name: Install Gradle
+        run: |
+          wget -q "https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip" -O /tmp/gradle.zip
+          unzip -q /tmp/gradle.zip -d /tmp/gradle
+          echo "/tmp/gradle/gradle-${GRADLE_VERSION}/bin" >> $GITHUB_PATH
+
+      - name: Generate Gradle Wrapper
+        working-directory: mobile/android
+        run: gradle wrapper --gradle-version ${{ env.GRADLE_VERSION }}
+
       - name: Cache Gradle
         uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
+            mobile/android/.gradle
           key: ${{ runner.os }}-gradle-${{ hashFiles('mobile/android/**/*.gradle*', 'mobile/android/**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
 
       - name: Build APK
-        working-directory: mobile
-        run: |
-          cd android
-          chmod +x gradlew || true
-          ./gradlew assembleRelease --no-daemon
-
-      - name: Sign APK (if keystore exists)
         working-directory: mobile/android
-        run: |
-          if [ -f "app/release.keystore" ]; then
-            jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 \
-              -keystore app/release.keystore \
-              app/build/outputs/apk/release/app-release-unsigned.apk \
-              andash-release
-          fi
+        run: ./gradlew assembleRelease --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
