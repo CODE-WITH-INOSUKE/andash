@@ -1,15 +1,12 @@
 package com.andash;
 
 import android.annotation.SuppressLint;
-import android.app.Presentation;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.SslErrorHandler;
@@ -32,8 +29,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView loadingText;
     private FrameLayout loadingContainer;
     private PowerManager.WakeLock wakeLock;
-    private int webViewProgress = 0;
-    private boolean isPageLoaded = false;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -63,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         settings.setAllowUniversalAccessFromFileURLs(true);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setAppCacheEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
@@ -71,9 +65,6 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             settings.setOffscreenPreRaster(true);
         }
-        settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
-
-        WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
 
         // WebView client
         webView.setWebViewClient(new WebViewClient() {
@@ -83,15 +74,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                super.onPageStarted(view, url, favicon);
-                isPageLoaded = false;
-            }
-
-            @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                isPageLoaded = true;
                 loadingContainer.setVisibility(View.GONE);
 
                 // Inject AMOLED theme and touch fixes
@@ -117,7 +101,6 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
-                webViewProgress = newProgress;
                 progressBar.setProgress(newProgress);
                 if (newProgress < 100) {
                     progressBar.setVisibility(View.VISIBLE);
