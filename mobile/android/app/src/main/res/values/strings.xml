@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Andash</string>
+    <string name="backend_url">http://localhost:3001</string>
 </resources>

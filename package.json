@@ -2,17 +2,11 @@
   "name": "andash",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "backend",
-    "web",
-    "mobile"
-  ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:web\"",
     "dev:backend": "npm -w backend run dev",
     "dev:web": "npm -w web run dev",
     "build": "npm -w web run build",
-    "build:apk": "npm -w mobile run build:apk",
     "lint": "npm -w web run lint && npm -w backend run lint",
     "typecheck": "npm -w web run typecheck && npm -w backend run typecheck"
   },
