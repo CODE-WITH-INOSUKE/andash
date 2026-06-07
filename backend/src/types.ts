@@ -12,6 +12,9 @@ export interface Track {
   format?: string;
   bitrate?: number;
   sampleRate?: number;
+  playCount?: number;
+  favorite?: number;
+  createdAt?: string;
 }
 
 export interface Playlist {

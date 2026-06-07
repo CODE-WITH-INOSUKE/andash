@@ -30,13 +30,14 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(webDistPath, 'index.html'));
 });
 
-// Initialize
-initDatabase();
-setupWebSocket(wss);
+// Initialize (async)
+initDatabase().then(() => {
+  setupWebSocket(wss);
 
-server.listen(PORT, () => {
-  console.log(`Andash server running on http://localhost:${PORT}`);
-  console.log(`WebSocket server on ws://localhost:${PORT}/ws`);
+  server.listen(PORT, () => {
+    console.log(`Andash server running on http://localhost:${PORT}`);
+    console.log(`WebSocket server on ws://localhost:${PORT}/ws`);
+  });
 });
 
 // Cleanup
